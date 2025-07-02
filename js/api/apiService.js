@@ -1,5 +1,5 @@
 // =============================================================
-// Adiciona função para verificar autenticação.
+// Define as funções de requisição para as rotas da API do backend (services)
 // =============================================================
 // Entrada: Nenhuma (define e exporta funções de serviço)
 // Saída: Objeto (apiService com métodos)
@@ -79,4 +79,21 @@ async function checkAuthStatus() {
 }
 
 
-export { getGreeting, postData, scheduleEvent, checkAuthStatus };
+/**
+ * Importa eventos de uma planilha Google Sheets.
+ * @param {string} spreadsheetId - O ID da planilha.
+ * @param {string} sheetName - O nome da aba da planilha.
+ * @returns {Promise<object>} - O resumo do processo de importação.
+ */
+// Entrada: spreadsheetId (String), sheetName (String)
+// Saída: Promise<Object>
+async function importEventsFromSheet(spreadsheetId, sheetName) {
+    return httpRequest('/sheets/import-events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spreadsheetId, sheetName })
+    });
+}
+
+
+export { getGreeting, postData, scheduleEvent, checkAuthStatus, importEventsFromSheet }; // EXPORTA importEventsFromSheet

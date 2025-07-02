@@ -1,6 +1,6 @@
 // Entrada: Nenhuma (inicializa e associa eventos)
 // Saída: void
-import { getGreeting, postData, scheduleEvent, checkAuthStatus } from './api/apiService.js';
+import { getGreeting, postData, scheduleEvent, checkAuthStatus, importEventsFromSheet} from './api/apiService.js';
 import { displayResult, updateLoginStatusDisplay } from './utils/domHandler.js';
 
 
@@ -96,6 +96,38 @@ const checkAndSetLoginStatus = async () => {
 };
 
 
+// Função para lidar com o clique do botão "Importar Eventos da Planilha"
+async function handleImportEvents() {
+    const spreadsheetIdInput = document.getElementById('spreadsheetIdInput').value.trim();
+    const sheetNameInput = document.getElementById('sheetNameInput').value.trim();
+
+    // Validação no front-end para garantir que o ID da planilha foi fornecido
+    if (!spreadsheetIdInput) {
+        displayResult('Por favor, insira o ID da Planilha Google.', true);
+        return;
+    }
+    if (!sheetNameInput) {
+        displayResult('Por favor, insira o Nome da Aba (ex: Sheet1).', true);
+        return;
+    }
+
+    displayResult(`Importando eventos da planilha "${spreadsheetIdInput}" na aba "${sheetNameInput}"...`);
+
+    try {
+        const result = await importEventsFromSheet(spreadsheetIdInput, sheetNameInput); // Passa os inputs
+        console.log('POST /sheets/import-events: ', result);
+        let successMessage = `Importação concluída! ${result.processedEvents.length} eventos processados.`;
+        if (result.processedEvents.length > 0) {
+             successMessage += `<br>Verifique seu Google Calendar e a planilha.`;
+        }
+        displayResult(successMessage);
+    } catch (error) {
+        console.error('Erro ao importar eventos da planilha:', error);
+        displayResult(`Erro ao importar eventos da planilha: ${error.message}`, true);
+    }
+}
+
+
 // Adiciona event listeners aos botões após o DOM estar completamente carregado
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('getGreetingBtn').addEventListener('click', handleGetGreeting);
@@ -103,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('checkAuthBtn').addEventListener('click', handleCheckAuth);
     document.getElementById('scheduleEventBtn').addEventListener('click', handleScheduleEvent);
     document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleLogin);
+    document.getElementById('importEventsBtn').addEventListener('click', handleImportEvents);
 
     // Chama a verificação e atualização de status no carregamento inicial da página
     checkAndSetLoginStatus();
