@@ -3,6 +3,7 @@
 // =============================================================
 // Entrada: Nenhuma (define e exporta funções de serviço)
 // Saída: Objeto (apiService com métodos)
+
 import { API_BASE_URL } from './apiConfig.js';
 
 const getJwt = () => {
@@ -59,7 +60,6 @@ async function postData(data) {
         body: JSON.stringify(data)
     });
 }
-
 async function scheduleEvent(eventDetails) {
     return httpRequest('/schedule-event', {
         method: 'POST',
@@ -67,26 +67,9 @@ async function scheduleEvent(eventDetails) {
         body: JSON.stringify(eventDetails)
     });
 }
-
-/**
- * Verifica o status de autenticação com o backend.
- * @returns {Promise<object>} - Objeto contendo `authenticated` (boolean) e `user` (object, se autenticado).
- */
-// Entrada: Nenhuma
-// Saída: Promise<Object>
 async function checkAuthStatus() {
-    return httpRequest('/check-auth'); // Não precisa de método específico, padrão é GET
+    return httpRequest('/check-auth');
 }
-
-
-/**
- * Importa eventos de uma planilha Google Sheets.
- * @param {string} spreadsheetId - O ID da planilha.
- * @param {string} sheetName - O nome da aba da planilha.
- * @returns {Promise<object>} - O resumo do processo de importação.
- */
-// Entrada: spreadsheetId (String), sheetName (String)
-// Saída: Promise<Object>
 async function importEventsFromSheet(spreadsheetId, sheetName) {
     return httpRequest('/sheets/import-events', {
         method: 'POST',
@@ -95,5 +78,20 @@ async function importEventsFromSheet(spreadsheetId, sheetName) {
     });
 }
 
+/**
+ * Realiza o logout do usuário.
+ * @returns {Promise<object>} - A resposta do servidor sobre o logout.
+ */
+// Entrada: Nenhuma
+// Saída: Promise<Object>
+async function logout() {
+    // Logout é uma requisição POST para invalidar a sessão no backend.
+    // O JWT será automaticamente incluído por httpRequest.
+    return httpRequest('/auth/logout', {
+        method: 'POST'
+        // Não precisa de body, o backend pega sessionId do JWT.
+    });
+}
 
-export { getGreeting, postData, scheduleEvent, checkAuthStatus, importEventsFromSheet }; // EXPORTA importEventsFromSheet
+
+export { getGreeting, postData, scheduleEvent, checkAuthStatus, importEventsFromSheet, logout };

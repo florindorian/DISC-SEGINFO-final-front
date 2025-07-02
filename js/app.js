@@ -1,6 +1,6 @@
 // Entrada: Nenhuma (inicializa e associa eventos)
 // Saída: void
-import { getGreeting, postData, scheduleEvent, checkAuthStatus, importEventsFromSheet} from './api/apiService.js';
+import { getGreeting, postData, scheduleEvent, checkAuthStatus, importEventsFromSheet, logout} from './api/apiService.js';
 import { displayResult, updateLoginStatusDisplay } from './utils/domHandler.js';
 
 
@@ -63,19 +63,54 @@ async function handleCheckAuth() {
         if (status.authenticated) {
             displayResult(`Autenticado como: ${status.user.name} (${status.user.email})`);
             updateLoginStatusDisplay(true, status.user.name);
+            updateLoginButtonVisibility(true); // Mostra Logout, esconde Login
         } else {
             displayResult(`Não autenticado: ${status.message}`, true);
             updateLoginStatusDisplay(false);
+            updateLoginButtonVisibility(false); // Mostra Login, esconde Logout
         }
     } catch (error) {
         console.error('Erro ao verificar autenticação:', error);
         displayResult(`Erro ao verificar autenticação: ${error.message}`, true);
         updateLoginStatusDisplay(false);
+        updateLoginButtonVisibility(false); // Mostra Login, esconde Logout
     }
 }
 
 async function handleGoogleLogin() {
-    window.location.href = 'http://localhost:3001/auth/google'; // Rota de login com Google
+    window.location.href = 'http://localhost:3001/auth/google';
+}
+
+
+async function handleLogout() {
+    displayResult('Realizando logout...');
+    try {
+        await logout(); // Chama o endpoint de logout no backend
+        localStorage.removeItem('appJwt'); // Limpa o token do localStorage
+        updateLoginStatusDisplay(false); // Atualiza status para não logado
+        updateLoginButtonVisibility(false); // Ajusta visibilidade dos botões
+        displayResult('Logout realizado com sucesso!');
+        console.log('Logout completo. JWT removido do localStorage.');
+    } catch (error) {
+        console.error('Erro ao realizar logout:', error);
+        displayResult(`Erro ao realizar logout: ${error.message}`, true);
+    }
+}
+
+// =============================================================
+// Função para controlar a visibilidade dos botões de Login/Logout
+// =============================================================
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+
+function updateLoginButtonVisibility(isAuthenticated) {
+    if (isAuthenticated) {
+        googleLoginBtn.style.display = 'none'; // Esconde Login
+        logoutBtn.style.display = 'inline-block'; // Mostra Logout
+    } else {
+        googleLoginBtn.style.display = 'inline-block'; // Mostra Login
+        logoutBtn.style.display = 'none'; // Esconde Logout
+    }
 }
 
 
@@ -85,13 +120,16 @@ const checkAndSetLoginStatus = async () => {
         try {
             const status = await checkAuthStatus();
             updateLoginStatusDisplay(status.authenticated, status.user ? status.user.name : null);
+            updateLoginButtonVisibility(status.authenticated); // ATUALIZA VISIBILIDADE NO INÍCIO
         } catch (error) {
             console.warn('Verificação de status inicial falhou, usuário não autenticado:', error.message);
-            localStorage.removeItem('appJwt'); // Limpa token inválido
+            localStorage.removeItem('appJwt');
             updateLoginStatusDisplay(false);
+            updateLoginButtonVisibility(false); // ATUALIZA VISIBILIDADE
         }
     } else {
         updateLoginStatusDisplay(false);
+        updateLoginButtonVisibility(false); // ATUALIZA VISIBILIDADE
     }
 };
 
@@ -127,8 +165,6 @@ async function handleImportEvents() {
     }
 }
 
-
-// Adiciona event listeners aos botões após o DOM estar completamente carregado
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('getGreetingBtn').addEventListener('click', handleGetGreeting);
     document.getElementById('postDataBtn').addEventListener('click', handlePostData);
@@ -136,12 +172,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('scheduleEventBtn').addEventListener('click', handleScheduleEvent);
     document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleLogin);
     document.getElementById('importEventsBtn').addEventListener('click', handleImportEvents);
+    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
     // Chama a verificação e atualização de status no carregamento inicial da página
     checkAndSetLoginStatus();
 });
 
-// Lógica para salvar o JWT do hash na URL
 document.addEventListener('DOMContentLoaded', () => {
     const hash = window.location.hash;
     if (hash.includes('access_token=')) {
@@ -151,6 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
         history.replaceState(null, '', window.location.pathname + window.location.search);
         displayResult('Autenticação com Google e sua aplicação concluída! Token recebido e armazenado.');
         // Chama a verificação e atualização de status novamente após o login bem-sucedido
-        checkAndSetLoginStatus();
+        checkAndSetLoginStatus(); // Re-checa para atualizar status e visibilidade dos botões
     }
 });
