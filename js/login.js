@@ -1,0 +1,42 @@
+// =============================================================
+// Lógica para a página de login.
+// =============================================================
+// Entrada: Nenhuma (inicializa e associa eventos)
+// Saída: void
+import { displayResult } from './utils/domHandler.js'; // Reutiliza displayResult
+
+async function handleGoogleLogin() {
+    // URL do endpoint de autenticação OAuth do back-end
+    const authUrl = 'http://localhost:3001/auth/google';
+    console.log(`Redirecionando para: ${authUrl}`);
+    
+    window.location.href = authUrl;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', handleGoogleLogin);
+    }
+
+    const hash = window.location.hash;
+    if (hash.includes('access_token=')) {
+        // Fluxo de SUCESSO após OAuth
+        const token = hash.split('access_token=')[1].split('&')[0];
+        console.log('JWT recebido no hash da URL (em login.js):', token);
+        localStorage.setItem('appJwt', token); // Salva o token
+        history.replaceState(null, '', window.location.pathname + window.location.search); // Limpa o hash
+
+        displayResult('Login bem-sucedido! Redirecionando para a página principal...', false);
+        // Redireciona para a página principal após salvar o token
+        window.location.href = 'http://127.0.0.1:5500/index.html';
+    } else if (hash.includes('error=')) {
+        // Fluxo de ERRO após OAuth
+        const errorMessage = decodeURIComponent(hash.split('error=')[1].split('&')[0]);
+        displayResult(`Erro no login: ${errorMessage}. Por favor, tente novamente.`, true);
+        history.replaceState(null, '', window.location.pathname + window.location.search); // Limpa o hash
+    } else {
+        // Estado inicial da página de login
+        displayResult('Faça login para acessar as funcionalidades.', false);
+    }
+});

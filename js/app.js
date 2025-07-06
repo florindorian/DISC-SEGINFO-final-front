@@ -1,40 +1,73 @@
 // Entrada: Nenhuma (inicializa e associa eventos)
 // Saída: void
-import { getGreeting, postData, scheduleEvent, checkAuthStatus, importEventsFromSheet, logout} from './api/apiService.js';
+import { scheduleEvent, checkAuthStatus, importEventsFromSheet, logout} from './api/apiService.js';
 import { displayResult, updateLoginStatusDisplay } from './utils/domHandler.js';
 
+const appContent = document.getElementById('app-content');
 
-// Função para lidar com o clique do botão "Obter Saudação"
-async function handleGetGreeting() {
+// =============================================================
+// Lógica de verificação de autenticação na página principal
+// =============================================================
+const verifyAuthAndLoadContent = async () => {
+    const token = localStorage.getItem('appJwt');
+    if (!token) {
+        // Se não tem token no localStorage, redireciona para a página de login
+        console.warn('Token JWT não encontrado. Redirecionando para login.');
+        window.location.href = 'http://127.0.0.1:5500/login.html';
+        return;
+    }
+
     try {
-        const greeting = await getGreeting();
-        console.log('GET /: ', greeting);
-        displayResult(`Saudação recebida: "${greeting}"`);
+        const status = await checkAuthStatus(); // Verifica o token com o backend
+        if (status.authenticated) {
+            updateLoginStatusDisplay(true, status.user.name);
+            updateLoginButtonVisibility(true);
+            displayResult(`Bem-vindo, ${status.user.name}!`);
+            appContent.style.display = 'block'; // Mostra o conteúdo após a autenticação bem-sucedida
+        } else {
+            console.warn('Token JWT inválido ou sessão inativa. Redirecionando para login.');
+            localStorage.removeItem('appJwt'); // Limpa token inválido
+            window.location.href = 'http://127.0.0.1:5500/login.html';
+        }
     } catch (error) {
-        console.error('Erro ao obter saudação:', error);
-        displayResult(`Erro ao obter saudação: ${error.message}`, true);
+        console.error('Erro ao verificar autenticação inicial:', error);
+        localStorage.removeItem('appJwt'); // Limpa token inválido ou erro de fetch
+        window.location.href = 'http://127.0.0.1:5500/login.html';
+    }
+};
+
+// Botão de Logout específico para index.html
+async function handleLogout() {
+    displayResult('Realizando logout...');
+    try {
+        await logout();
+        localStorage.removeItem('appJwt');
+        window.location.href = 'http://127.0.0.1:5500/login.html';
+    } catch (error) {
+        console.error('Erro ao realizar logout:', error);
+        displayResult(`Erro ao realizar logout: ${error.message}`, true);
+        // Se houver erro no logout, mesmo assim tente redirecionar para a página de login
+        // para evitar que o usuário fique em um estado "meio logado".
+        localStorage.removeItem('appJwt'); // Garante que o token é removido mesmo com erro no backend.
+        window.location.href = 'http://127.0.0.1:5500/teste-frontend/login.html';
     }
 }
 
-// Função para lidar com o clique do botão "Enviar Dados"
-async function handlePostData() {
-    const dataToSend = {
-        nome: "Usuário Teste",
-        idade: Math.floor(Math.random() * 50) + 20, // Idade aleatória
-        cidade: "Minha Cidade"
-    };
-
-    try {
-        const result = await postData(dataToSend);
-        console.log('POST /dados: ', result);
-        displayResult(`Dados enviados com sucesso! Resposta: ${JSON.stringify(result)}`);
-    } catch (error) {
-        console.error('Erro ao enviar dados:', error);
-        displayResult(`Erro ao enviar dados: ${error.message}`, true);
+// Gerenciamento de visibilidade de botões (agora apenas o botão de Logout é gerenciado)
+const logoutBtn = document.getElementById('logoutBtn');
+function updateLoginButtonVisibility(isAuthenticated) {
+    if (isAuthenticated) {
+        logoutBtn.style.display = 'inline-block';
+    } else {
+        logoutBtn.style.display = 'none';
     }
 }
 
+
+
+// =============================================================
 // Função para lidar com o clique do botão "Agendar Evento"
+// =============================================================
 async function handleScheduleEvent() {
     const title = document.getElementById('eventTitle').value;
     const year = parseInt(document.getElementById('eventYear').value, 10);
@@ -56,92 +89,37 @@ async function handleScheduleEvent() {
     }
 }
 
-async function handleCheckAuth() {
-    try {
-        const status = await checkAuthStatus();
-        console.log('GET /check-auth: ', status);
-        if (status.authenticated) {
-            displayResult(`Autenticado como: ${status.user.name} (${status.user.email})`);
-            updateLoginStatusDisplay(true, status.user.name);
-            updateLoginButtonVisibility(true); // Mostra Logout, esconde Login
-        } else {
-            displayResult(`Não autenticado: ${status.message}`, true);
-            updateLoginStatusDisplay(false);
-            updateLoginButtonVisibility(false); // Mostra Login, esconde Logout
-        }
-    } catch (error) {
-        console.error('Erro ao verificar autenticação:', error);
-        displayResult(`Erro ao verificar autenticação: ${error.message}`, true);
-        updateLoginStatusDisplay(false);
-        updateLoginButtonVisibility(false); // Mostra Login, esconde Logout
-    }
-}
-
-async function handleGoogleLogin() {
-    window.location.href = 'http://localhost:3001/auth/google';
-}
-
-
-async function handleLogout() {
-    displayResult('Realizando logout...');
-    try {
-        await logout(); // Chama o endpoint de logout no backend
-        localStorage.removeItem('appJwt'); // Limpa o token do localStorage
-        updateLoginStatusDisplay(false); // Atualiza status para não logado
-        updateLoginButtonVisibility(false); // Ajusta visibilidade dos botões
-        displayResult('Logout realizado com sucesso!');
-        console.log('Logout completo. JWT removido do localStorage.');
-    } catch (error) {
-        console.error('Erro ao realizar logout:', error);
-        displayResult(`Erro ao realizar logout: ${error.message}`, true);
-    }
-}
-
 // =============================================================
-// Função para controlar a visibilidade dos botões de Login/Logout
+// Função auxiliar para extrair o ID da planilha da URL
 // =============================================================
-const googleLoginBtn = document.getElementById('googleLoginBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-
-function updateLoginButtonVisibility(isAuthenticated) {
-    if (isAuthenticated) {
-        googleLoginBtn.style.display = 'none'; // Esconde Login
-        logoutBtn.style.display = 'inline-block'; // Mostra Logout
-    } else {
-        googleLoginBtn.style.display = 'inline-block'; // Mostra Login
-        logoutBtn.style.display = 'none'; // Esconde Logout
+/**
+ * Extrai o ID da planilha Google Sheets de uma URL.
+ * @param {string} url - A URL completa da planilha (ex: "https://docs.google.com/spreadsheets/d/ID_AQUI/edit#gid=0").
+ * @returns {string | null} - O ID da planilha ou null se não for encontrada.
+ */
+// Entrada: url (String)
+// Saída: String (ID da planilha) ou null
+function extractSpreadsheetIdFromUrl(url) {
+    // Regex para capturar o ID entre "/d/" e "/edit" (ou outro "/view", etc.)
+    // ou entre "/spreadsheets/" e "/edit" se for uma URL mais longa.
+    const regex = /\/spreadsheets\/d\/([a-zA-Z0-9_-]+)(?:\/edit|\/view|\/pub|\/export)?(?:#gid=\d+)?/i;
+    const match = url.match(regex);
+    if (match && match[1]) {
+        console.log(`Front-end: ID da planilha extraído: ${match[1]}`);
+        return match[1];
     }
+    console.warn(`Front-end: Não foi possível extrair o ID da planilha da URL: "${url}"`);
+    return null;
 }
-
-
-const checkAndSetLoginStatus = async () => {
-    const token = localStorage.getItem('appJwt');
-    if (token) {
-        try {
-            const status = await checkAuthStatus();
-            updateLoginStatusDisplay(status.authenticated, status.user ? status.user.name : null);
-            updateLoginButtonVisibility(status.authenticated); // ATUALIZA VISIBILIDADE NO INÍCIO
-        } catch (error) {
-            console.warn('Verificação de status inicial falhou, usuário não autenticado:', error.message);
-            localStorage.removeItem('appJwt');
-            updateLoginStatusDisplay(false);
-            updateLoginButtonVisibility(false); // ATUALIZA VISIBILIDADE
-        }
-    } else {
-        updateLoginStatusDisplay(false);
-        updateLoginButtonVisibility(false); // ATUALIZA VISIBILIDADE
-    }
-};
 
 
 // Função para lidar com o clique do botão "Importar Eventos da Planilha"
 async function handleImportEvents() {
-    const spreadsheetIdInput = document.getElementById('spreadsheetIdInput').value.trim();
+    const spreadsheetUrl = document.getElementById('spreadsheetIdInput').value.trim(); // URL da planilha
     const sheetNameInput = document.getElementById('sheetNameInput').value.trim();
 
-    // Validação no front-end para garantir que o ID da planilha foi fornecido
-    if (!spreadsheetIdInput) {
-        displayResult('Por favor, insira o ID da Planilha Google.', true);
+    if (!spreadsheetUrl) {
+        displayResult('Por favor, insira a URL da Planilha Google.', true);
         return;
     }
     if (!sheetNameInput) {
@@ -149,10 +127,16 @@ async function handleImportEvents() {
         return;
     }
 
-    displayResult(`Importando eventos da planilha "${spreadsheetIdInput}" na aba "${sheetNameInput}"...`);
+    const spreadsheetId = extractSpreadsheetIdFromUrl(spreadsheetUrl); // extrai o ID da URL fornecida
+    if (!spreadsheetId) {
+        displayResult('Não foi possível extrair um ID válido da URL da planilha fornecida. Verifique se a URL está correta.', true);
+        return;
+    }
+
+    displayResult(`Importando eventos da planilha "${spreadsheetId}" na aba "${sheetNameInput}"...`);
 
     try {
-        const result = await importEventsFromSheet(spreadsheetIdInput, sheetNameInput); // Passa os inputs
+        const result = await importEventsFromSheet(spreadsheetId, sheetNameInput); // Passa o ID extraído
         console.log('POST /sheets/import-events: ', result);
         let successMessage = `Importação concluída! ${result.processedEvents.length} eventos processados.`;
         if (result.processedEvents.length > 0) {
@@ -165,28 +149,14 @@ async function handleImportEvents() {
     }
 }
 
+// ======================================================================
+// Inicializa os eventos de clique e verifica o estado de autenticação
+// ======================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('getGreetingBtn').addEventListener('click', handleGetGreeting);
-    document.getElementById('postDataBtn').addEventListener('click', handlePostData);
-    document.getElementById('checkAuthBtn').addEventListener('click', handleCheckAuth);
     document.getElementById('scheduleEventBtn').addEventListener('click', handleScheduleEvent);
-    document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleLogin);
     document.getElementById('importEventsBtn').addEventListener('click', handleImportEvents);
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-
-    // Chama a verificação e atualização de status no carregamento inicial da página
-    checkAndSetLoginStatus();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const hash = window.location.hash;
-    if (hash.includes('access_token=')) {
-        const token = hash.split('access_token=')[1].split('&')[0];
-        console.log('JWT recebido na URL hash:', token);
-        localStorage.setItem('appJwt', token);
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-        displayResult('Autenticação com Google e sua aplicação concluída! Token recebido e armazenado.');
-        // Chama a verificação e atualização de status novamente após o login bem-sucedido
-        checkAndSetLoginStatus(); // Re-checa para atualizar status e visibilidade dos botões
-    }
+    
+    // Inicia a verificação de autenticação e carregamento do conteúdo.
+    verifyAuthAndLoadContent();
 });

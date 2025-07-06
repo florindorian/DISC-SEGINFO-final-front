@@ -1,40 +1,47 @@
+<!-- ==================================== -->
+<!-- Página principal de funcionalidades  -->
+<!-- ==================================== -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste de Comunicação Front-end/Back-end</title>
+    <title>G-API Orchestrator - Funcionalidades</title>
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Estilo para evitar FOUC (Flash Of Unstyled Content) [conteúdo oculto por padrão] -->
+    <style>
+        #app-content {
+            display: none; /* Conteúdo oculto até a autenticação */
+        }
+    </style>
 </head>
 <body>
-    <h1>Comunicação com o Back-end</h1>
-    <p>Verifique o console do navegador (F12) para os resultados das requisições.</p>
+    <div id="app-content">
+        <h1>Funcionalidades do G-API Orchestrator</h1>
+        <p>Verifique o console do navegador (F12) para os resultados das requisições.</p>
+        
+        <hr>
+        <h2>Estado da Aplicação</h2>
+        <button id="logoutBtn">Logout</button>
+        <span id="loginStatus" class="login-status"></span> 
 
-    <button id="getGreetingBtn">Obter Saudação (GET /)</button>
-    <button id="postDataBtn">Enviar Dados (POST /dados)</button>
-    <button id="checkAuthBtn">Verificar Autenticação (GET /check-auth)</button>
-    
-    <hr>
-    <h2>Autenticação Google</h2>
-    <button id="googleLoginBtn">Login com Google</button>
-    <button id="logoutBtn" style="display: none;">Logout</button>
-    <span id="loginStatus" class="login-status"></span> 
+        <hr>
+        <h2>Google Calendar</h2>
+        <input type="text" id="eventTitle" placeholder="Título do Evento">
+        <input type="number" id="eventYear" placeholder="Ano" value="2025">
+        <input type="number" id="eventMonth" placeholder="Mês" value="7">
+        <input type="number" id="eventDay" placeholder="Dia" value="1">
+        <button id="scheduleEventBtn">Agendar Evento</button>
 
-    <hr>
-    <h2>Google Calendar</h2>
-    <input type="text" id="eventTitle" placeholder="Título do Evento">
-    <input type="number" id="eventYear" placeholder="Ano" value="2025">
-    <input type="number" id="eventMonth" placeholder="Mês" value="7">
-    <input type="number" id="eventDay" placeholder="Dia" value="1">
-    <button id="scheduleEventBtn">Agendar Evento</button>
+        <hr>
+        <h2>Google Sheets</h2>
+        <input type="text" id="spreadsheetIdInput" placeholder="URL da Planilha Google (obrigatório)">
+        <input type="text" id="sheetNameInput" placeholder="Nome da Aba (ex: Sheet1)">
+        <button id="importEventsBtn">Importar Eventos da Planilha</button>
 
-    <hr>
-    <h2>Google Sheets</h2>
-    <input type="text" id="spreadsheetIdInput" placeholder="ID da Planilha Google (obrigatório)">
-    <input type="text" id="sheetNameInput" placeholder="Nome da Aba (ex: Sheet1)">
-    <button id="importEventsBtn">Importar Eventos da Planilha</button>
-
-    <div id="result"></div>
+        <div id="result"></div>
+    </div>
 
     <script type="module" src="js/app.js"></script>
 </body>
