@@ -10,15 +10,26 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="container" style="text-align: center; margin-top: 100px;">
-        <h1>Bem-vindo ao G-API Orchestrator</h1>
-        <p>Use seus serviços Google de forma customizada.</p>
-        
-        <hr>
-        <h2>Faça Login</h2>
-        <button id="googleLoginBtn">Login com Google</button>
-        <div id="result" style="margin-top: 20px;"></div> <!-- Para mensagens de erro/sucesso do login -->
-    </div>
+    <header class="app-header">
+        <h1><span class="app-logo">✨</span> G-API Orchestrator</h1>
+        <nav class="app-nav">
+            <!-- Futuro menu global, por enquanto vazio -->
+            <ul></ul>
+        </nav>
+    </header>
+
+    <main class="app-container" style="text-align: center;">
+        <div class="card" style="max-width: 500px; margin: 50px auto;">
+            <h2>Faça Login</h2>
+            <p>Use seus serviços Google de forma customizada.</p>
+            <button id="googleLoginBtn">Login com Google</button>
+            <div id="loginMessage" class="message-area" style="margin-top: 20px;"></div> 
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>© 2025 G-API Orchestrator. Todos os direitos reservados.</p>
+    </footer>
 
     <script type="module" src="js/login.js"></script>
 </body>

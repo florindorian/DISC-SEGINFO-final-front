@@ -11,16 +11,15 @@ const loginStatusSpan = document.getElementById('loginStatus');
 
 /**
  * Exibe uma mensagem na div de resultados da página.
+ * Esta função deve ser usada nas páginas que têm um #result.
  * @param {string} message - A mensagem a ser exibida.
  * @param {boolean} isError - True se a mensagem for um erro, false caso contrário.
  */
 const displayResult = (message, isError = false) => {
-    // Verifica se resultDiv existe antes de tentar manipular (para login.html)
     if (resultDiv) {
-        resultDiv.innerHTML = `<p style="color: ${isError ? 'red' : 'green'};">${message}</p>`;
+        resultDiv.innerHTML = `<p class="${isError ? 'error-message' : 'success-message'}">${message}</p>`;
     } else {
-        // Se estiver em login.html, pode logar no console ou usar um elemento específico lá.
-        console.log(`[Display Result - ${isError ? 'ERROR' : 'INFO'}]: ${message}`);
+        console.log(`[DOMHandler - ${isError ? 'ERROR' : 'INFO'}]: ${message}`);
     }
 };
 
@@ -30,17 +29,10 @@ const displayResult = (message, isError = false) => {
  * @param {string | null} userName - O nome do usuário, se autenticado.
  */
 const updateLoginStatusDisplay = (isAuthenticated, userName = null) => {
-    // Verifica se loginStatusSpan existe antes de tentar manipular (para login.html)
     if (loginStatusSpan) {
-        if (isAuthenticated) {
-            loginStatusSpan.textContent = `Logado como: ${userName}`;
-            loginStatusSpan.classList.remove('status-not-logged-in');
-            loginStatusSpan.classList.add('status-logged-in');
-        } else {
-            loginStatusSpan.textContent = 'Não logado';
-            loginStatusSpan.classList.remove('status-logged-in');
-            loginStatusSpan.classList.add('status-not-logged-in');
-        }
+        loginStatusSpan.textContent = isAuthenticated ? `Logado como: ${userName}` : 'Não logado';
+        loginStatusSpan.classList.toggle('status-logged-in', isAuthenticated);
+        loginStatusSpan.classList.toggle('status-not-logged-in', !isAuthenticated);
     }
 };
 
