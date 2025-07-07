@@ -1,7 +1,7 @@
 // Entrada: Nenhuma (inicializa e associa eventos)
 // Saída: void
 import { scheduleEvent, checkAuthStatus, importEventsFromSheet, logout} from './api/apiService.js';
-import { displayResult, updateLoginStatusDisplay } from './utils/domHandler.js';
+import { displayResult } from './utils/domHandler.js';
 
 const appContent = document.getElementById('app-content');
 
@@ -18,11 +18,11 @@ const verifyAuthAndLoadContent = async () => {
     }
 
     try {
-        const status = await checkAuthStatus(); // Verifica o token com o backend
+        // Verifica o token com o backend
+        const status = await checkAuthStatus(); // Retorna { authenticated: boolean, user: { name: string, email: string, picture: string } }
         if (status.authenticated) {
-            updateLoginStatusDisplay(true, status.user.name);
-            updateLoginButtonVisibility(true);
-            displayResult(`Bem-vindo, ${status.user.name}!`);
+            updateProfileDisplay(true, status.user); // Preenche e mostra o perfil no header
+            displayResult(`Bem-vindo(a), ${status.user.name}!`);
             appContent.style.display = 'block'; // Mostra o conteúdo após a autenticação bem-sucedida
         } else {
             console.warn('Token JWT inválido ou sessão inativa. Redirecionando para login.');
@@ -46,23 +46,81 @@ async function handleLogout() {
     } catch (error) {
         console.error('Erro ao realizar logout:', error);
         displayResult(`Erro ao realizar logout: ${error.message}`, true);
-        // Se houver erro no logout, mesmo assim tente redirecionar para a página de login
+        // Se houver erro no logout, mesmo assim tenta redirecionar para a página de login
         // para evitar que o usuário fique em um estado "meio logado".
         localStorage.removeItem('appJwt'); // Garante que o token é removido mesmo com erro no backend.
-        window.location.href = 'http://127.0.0.1:5500/teste-frontend/login.html';
+        window.location.href = 'http://127.0.0.1:5500/login.html';
     }
 }
 
-// Gerenciamento de visibilidade de botões (agora apenas o botão de Logout é gerenciado)
+// =============================================================
+// Referências aos elementos do Novo Header
+// =============================================================
+const hamburgerMenu = document.getElementById('hamburgerMenu');
+const mainNav = document.getElementById('mainNav');
+const mainNavCloseBtn = document.getElementById('mainNavCloseBtn'); // Botão Fechar do menu principal
+const profileMenuImage = document.getElementById('profileMenuImage');
+const profileCardDropdown = document.getElementById('profileCardDropdown');
+const profileDropdownCloseBtn = document.getElementById('profileDropdownCloseBtn'); // Botão Fechar do dropdown de perfil
+const profilePicture = document.getElementById('profilePicture');
+const profileName = document.getElementById('profileName');
+const profileEmail = document.getElementById('profileEmail');
 const logoutBtn = document.getElementById('logoutBtn');
-function updateLoginButtonVisibility(isAuthenticated) {
-    if (isAuthenticated) {
-        logoutBtn.style.display = 'inline-block';
+
+
+function updateProfileDisplay(isAuthenticated, user = null) {
+    if (isAuthenticated && user) {
+        profileMenuImage.src = user.picture || 'https://placehold.co/35?text=IMG';
+        profileMenuImage.style.display = 'block';
+        
+        profilePicture.src = user.picture || 'https://placehold.co/100?text=No\nPhoto';
+        profileName.textContent = user.name || 'Usuário Desconhecido';
+        profileEmail.textContent = user.email || '';
     } else {
-        logoutBtn.style.display = 'none';
+        profileMenuImage.style.display = 'none';
+        profileCardDropdown.classList.remove('active');
+        profileCardDropdown.classList.remove('mobile-active');
     }
 }
 
+// =============================================================
+// As funções show/hide agora gerenciam ambas as classes (active/mobile-active)
+// =============================================================
+let profileDropdownTimeout;
+
+function showProfileDropdown() {
+    clearTimeout(profileDropdownTimeout);
+    if (profileCardDropdown) {
+        // Desktop
+        if (window.innerWidth > 768) {
+            profileCardDropdown.classList.add('active');
+            mainNav.classList.remove('active'); // Garante que o mainNav esteja fechado (se aberto por JS)
+        } 
+        // Mobile - Usa mobile-active
+        else {
+            profileCardDropdown.classList.add('mobile-active');
+            mainNav.classList.remove('active'); // Garante que o mainNav esteja fechado
+        }
+    }
+}
+
+function hideProfileDropdown() {
+    profileDropdownTimeout = setTimeout(() => {
+        if (profileCardDropdown) {
+            profileCardDropdown.classList.remove('active');
+            profileCardDropdown.classList.remove('mobile-active');
+        }
+    }, 200);
+}
+
+// Lógica de toggle do menu hambúrguer
+function toggleHamburgerMenu() {
+    mainNav.classList.toggle('active');
+    // Fecha o dropdown de perfil se o menu hambúrguer for aberto
+    if (mainNav.classList.contains('active')) {
+        hideProfileDropdown(); // Usa hideProfileDropdown para fechar
+    }
+}
 
 
 // =============================================================
@@ -155,8 +213,54 @@ async function handleImportEvents() {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('scheduleEventBtn').addEventListener('click', handleScheduleEvent);
     document.getElementById('importEventsBtn').addEventListener('click', handleImportEvents);
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     
-    // Inicia a verificação de autenticação e carregamento do conteúdo.
+    // Listeners para a imagem de perfil
+    if (profileMenuImage) {
+        profileMenuImage.addEventListener('click', showProfileDropdown); // Click para abrir/fechar o dropdown de perfil
+        // Desktop hover listeners
+        profileMenuImage.addEventListener('mouseenter', showProfileDropdown);
+        profileMenuImage.addEventListener('mouseleave', hideProfileDropdown);
+    }
+    // Listeners para o próprio card de perfil (dropdown)
+    if (profileCardDropdown) {
+        profileCardDropdown.addEventListener('mouseenter', showProfileDropdown);
+        profileCardDropdown.addEventListener('mouseleave', hideProfileDropdown);
+    }
+
+    // =============================================================
+    // Listeners para os botões de fechar "X"
+    // =============================================================
+    if (mainNavCloseBtn) {
+        mainNavCloseBtn.addEventListener('click', () => {
+            mainNav.classList.remove('active'); // Fecha o menu principal
+            hideProfileDropdown(); // Garante que o perfil também feche
+        });
+    }
+    if (profileDropdownCloseBtn) {
+        profileDropdownCloseBtn.addEventListener('click', hideProfileDropdown); // Fecha o dropdown de perfil
+    }
+
+
+    // Esconde o dropdown/menu se clicar fora
+    document.addEventListener('click', (event) => {
+        const isClickInsideHeader = document.querySelector('.app-header').contains(event.target);
+        const isClickOnHamburger = hamburgerMenu.contains(event.target);
+        const isClickOnProfileImage = profileMenuImage.contains(event.target);
+        const isClickInsideProfileDropdown = profileCardDropdown.contains(event.target); // Para verificar clique dentro do dropdown
+
+        if (!isClickInsideHeader || (!isClickOnHamburger && !isClickOnProfileImage && !isClickInsideProfileDropdown)) {
+            mainNav.classList.remove('active');
+            hideProfileDropdown();
+        }
+    });
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+
+    if (hamburgerMenu) {
+        hamburgerMenu.addEventListener('click', toggleHamburgerMenu);
+    }
+    
     verifyAuthAndLoadContent();
 });

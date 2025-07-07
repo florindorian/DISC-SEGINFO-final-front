@@ -11,48 +11,78 @@
 </head>
 <body>
     <header class="app-header">
-        <h1><span class="app-logo">✨</span> G-API Orchestrator</h1>
-        <nav class="app-nav">
-            <!-- Futuro menu global, por enquanto vazio -->
-            <ul></ul>
+        <div class="app-header-left">
+            <img src="./assets/images/logos/api-logo.png" 
+                 alt="Cloud Logo" class="app-logo">
+            <h1>G-API Orchestrator</h1>
+        </div>
+        
+        <nav class="app-nav" id="mainNav">
+            <button class="close-button" id="mainNavCloseBtn">✕</button> <!-- Botão Fechar para o menu principal -->
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#">Sobre o App</a></li>
+            </ul>
         </nav>
+
+        <div class="app-header-right">
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-menu" id="hamburgerMenu">☰</button>
+
+            <!-- Profile Image -->
+            <img id="profileMenuImage" src="" alt="Perfil" class="profile-menu-img" style="display: none;">
+            
+            <!-- Profile Card Dropdown -->
+            <div id="profileCardDropdown" class="card">
+                <button class="close-button for-dropdown" id="profileDropdownCloseBtn">✕</button> <!-- Botão Fechar para o dropdown -->
+                <h3>Seu Perfil</h3>
+                <!-- A imagem maior do card de perfil -->
+                <img id="profilePicture" src="" alt="Foto de Perfil" class="profile-picture"> 
+                <p class="user-name" id="profileName"></p>
+                <p class="user-email" id="profileEmail"></p>
+                <button id="logoutBtn">Logout</button>
+            </div>
+        </div>
     </header>
 
     <main id="app-content" class="app-container">
-        <div class="button-group" style="justify-content: flex-end;">
-            <span id="loginStatus" class="login-status"></span> 
-            <button id="logoutBtn">Logout</button>
+        <div id="main-status-section" class="card">
+            <div id="result" class="message-area"></div>
         </div>
 
-        <div class="card">
-            <h3>📅 Gerenciar Google Calendar</h3>
-            <div class="form-group">
-                <label for="eventTitle">Título do Evento:</label>
-                <input type="text" id="eventTitle" placeholder="Título do Evento">
+        <div class="cards-grid">
+            <div class="card">
+                <h3>📅 Gerenciar Google Calendar</h3>
+                <div class="form-group">
+                    <label for="eventTitle">Título do Evento:</label>
+                    <input type="text" id="eventTitle" placeholder="Título do Evento">
+                </div>
+                <div class="form-group">
+                    <label>Data (Ano/Mês/Dia):</label>
+                    <input type="number" id="eventYear" placeholder="Ano" value="2025">
+                    <input type="number" id="eventMonth" placeholder="Mês" value="7">
+                    <input type="number" id="eventDay" placeholder="Dia" value="1">
+                </div>
+                <div class="button-group">
+                    <button id="scheduleEventBtn">Agendar Evento</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Data:</label>
-                <input type="number" id="eventYear" placeholder="Ano" value="2025">
-                <input type="number" id="eventMonth" placeholder="Mês" value="7">
-                <input type="number" id="eventDay" placeholder="Dia" value="1">
-            </div>
-            <button id="scheduleEventBtn">Agendar Evento</button>
-        </div>
 
-        <div class="card">
-            <h3>📈 Importar Eventos de Google Sheets</h3>
-            <div class="form-group">
-                <label for="spreadsheetIdInput">URL da Planilha Google:</label>
-                <input type="text" id="spreadsheetIdInput" placeholder="Ex: https://docs.google.com/spreadsheets/d/ID_AQUI/edit">
+            <div class="card">
+                <h3>📈 Importar Eventos de Google Sheets</h3>
+                <div class="form-group">
+                    <label for="spreadsheetIdInput">URL da Planilha Google (obrigatório):</label>
+                    <input type="text" id="spreadsheetIdInput" placeholder="https://docs.google.com/spreadsheets/d/ID_AQUI/edit">
+                </div>
+                <div class="form-group">
+                    <label for="sheetNameInput">Nome da Aba (ex: Sheet1):</label>
+                    <input type="text" id="sheetNameInput" placeholder="Nome da Aba">
+                </div>
+                <div class="button-group">
+                    <button id="importEventsBtn">Importar Eventos da Planilha</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="sheetNameInput">Nome da Aba:</label>
-                <input type="text" id="sheetNameInput" placeholder="Ex: Sheet1">
-            </div>
-            <button id="importEventsBtn">Importar Eventos da Planilha</button>
         </div>
-
-        <div id="result" class="card message-area"></div> <!-- Mensagens de resultado -->
 
     </main>
 

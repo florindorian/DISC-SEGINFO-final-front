@@ -1,24 +1,27 @@
 /* Cores Base */
 :root {
-    --primary-blue: hsl(210, 80%, 40%); /* Um azul médio-escuro */
-    --secondary-blue: hsl(210, 90%, 50%); /* Um azul vibrante */
-    --light-gray: hsl(210, 15%, 95%); /* Fundo quase branco */
-    --medium-gray: hsl(210, 10%, 80%); /* Borda/Sombra */
-    --dark-gray: hsl(210, 5%, 30%); /* Texto */
-    --success-green: hsl(120, 60%, 40%); /* Verde sucesso */
-    --error-red: hsl(0, 70%, 50%); /* Vermelho falha */
+    --primary-blue: hsl(210, 80%, 40%);
+    --secondary-blue: hsl(210, 90%, 50%);
+    --light-gray: hsl(210, 15%, 95%);
+    --medium-gray: hsl(210, 10%, 80%);
+    --dark-gray: hsl(210, 5%, 30%);
+    --success-green: hsl(120, 60%, 40%);
+    --error-red: hsl(0, 70%, 50%);
     --text-color: var(--dark-gray);
+    --border-radius: 8px;
+    --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    --header-height: 70px;
 }
 
 /* Base Reset & Body Styles */
 body {
     font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     margin: 0;
-    padding: 0;
+    padding-top: var(--header-height);
     background-color: var(--light-gray);
     color: var(--text-color);
     line-height: 1.6;
-    min-height: 100vh; /* Garante que o body ocupe a altura total da viewport */
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -26,59 +29,165 @@ body {
 /* Container Geral da Aplicação */
 .app-container {
     max-width: 1200px;
-    margin: 20px auto; /* Centraliza o container principal */
+    margin: 20px auto;
     padding: 20px;
-    box-sizing: border-box; /* Inclui padding na largura total */
-    flex-grow: 1; /* Permite que o container principal cresça e ocupe o espaço */
+    box-sizing: border-box;
+    flex-grow: 1;
 }
 
 /* Header (Logo e Título) */
 .app-header {
     background-color: var(--primary-blue);
     color: white;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    margin-bottom: 20px;
+    padding: 0 20px;
+    height: var(--header-height);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    flex-wrap: nowrap; /* Impede quebras de linha em desktop */
+    box-sizing: border-box;
+}
+
+.app-header-left {
+    display: flex;
+    align-items: center;
 }
 
 .app-header h1 {
     margin: 0;
-    font-size: 2em;
+    font-size: 1.8em;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 .app-logo {
-    font-size: 1.5em; /* Tamanho do ícone da logo */
-    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: white;
+    padding: 2px;
 }
 
-/* Menu (Placeholder Futuro) */
+.hamburger-menu {
+    display: none; /* Mostra o ícone de hambúrguer em mobile */
+}
+
+/* Menu de Navegação Principal (Home, etc.) - Visível em Desktop, Oculto em Mobile por padrão */
 .app-nav {
-    margin-top: 10px;
+    flex-grow: 1;
+    display: block; /* Visível por padrão em desktop */
 }
 .app-nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Centraliza os links de navegação em desktop */
+    align-items: center;
+    gap: 25px;
+    justify-content: flex-end; /* Alinha os itens do menu à direita em desktop */
+    padding-right: 15px;
 }
 .app-nav li {
-    margin: 0 15px;
+    display: flex;
+    align-items: center;
 }
 .app-nav a {
     color: white;
     text-decoration: none;
     font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
     transition: background-color 0.3s ease;
+    display: block;
 }
 .app-nav a:hover {
     background-color: var(--secondary-blue);
+}
+
+/* Container para a foto de perfil e o hambúrguer (lado direito do header) */
+.app-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Estilo para a imagem de perfil no menu */
+.profile-menu-img {
+    /* margin-right: 40px; */
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    display: block; /* Visível por padrão (desktop) */
+    position: relative; /* Para posicionar o dropdown relativo a ela */
+}
+.profile-menu-img:hover {
+    border-color: var(--secondary-blue);
+}
+
+/* Card de Perfil no Menu (Dropdown) */
+#profileCardDropdown {
+    /* margin-right: 60px; */
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 20px; /* Alinha o lado direito do dropdown com o lado direito da foto */
+    left: auto;
+    width: 280px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 15px;
+    z-index: 1001;
+    display: none; /* Oculto por padrão em desktop (mostrado via JS active class) */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    white-space: normal;
+    box-sizing: border-box;
+    transform: translateX(20px);
+}
+
+#profileCardDropdown.active {
+    display: flex;
+}
+
+#profileCardDropdown .profile-picture {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+    border: 2px solid var(--secondary-blue);
+    display: block; /* Visível por padrão no dropdown (desktop) */
+}
+
+#profileCardDropdown .user-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--primary-blue);
+}
+#profileCardDropdown .user-email {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+#profileCardDropdown #logoutBtn {
+    width: 100%;
+    margin: 0;
+    background-color: var(--error-red);
+}
+#profileCardDropdown #logoutBtn:hover {
+    background-color: hsl(0, 70%, 40%);
 }
 
 
@@ -91,15 +200,55 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* Cards para Organização de Seções */
+/* Status da Operação e Autenticação */
+#main-status-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#result {
+    flex-grow: 1;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+}
+#result p {
+    font-size: 1.1em;
+    margin: 0;
+}
+
+.login-status {
+    font-weight: bold;
+    margin-right: 0;
+    font-size: 1.1em;
+}
+
+/* Grid para Cards (2 Colunas) */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Cards em Geral */
 .card {
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
     padding: 20px;
-    margin-bottom: 20px;
     display: flex;
-    flex-direction: column; /* Conteúdo interno empilhado */
+    flex-direction: column;
 }
 
 .card h3 {
@@ -107,6 +256,8 @@ h2 {
     margin-top: 0;
     margin-bottom: 15px;
     font-size: 1.4em;
+    border-bottom: 1px solid var(--light-gray);
+    padding-bottom: 10px;
 }
 
 /* Formulários e Inputs */
@@ -124,7 +275,7 @@ input[type="text"],
 input[type="number"],
 input[type="password"],
 textarea {
-    width: calc(100% - 22px); /* 100% menos padding e borda */
+    width: calc(100% - 22px);
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid var(--medium-gray);
@@ -134,9 +285,16 @@ textarea {
 }
 
 /* Botões */
-button {
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: flex-start;
+}
+
+.button-group button {
     padding: 12px 20px;
-    margin: 5px 0; /* Ajustado para melhor espaçamento em colunas */
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -145,43 +303,42 @@ button {
     font-size: 1em;
     font-weight: bold;
     transition: background-color 0.3s ease, transform 0.1s ease;
+    flex-grow: 0;
 }
 
-button:hover {
+.button-group button:hover {
     background-color: var(--primary-blue);
     transform: translateY(-2px);
 }
 
-button:active {
+.button-group button:active {
     transform: translateY(0);
 }
 
-/* Alinhamento de Botões (para grupos) */
-.button-group {
-    display: flex;
-    flex-wrap: wrap; /* Permite que os botões quebrem linha */
-    gap: 10px; /* Espaço entre os botões */
-    margin-bottom: 15px;
-    align-items: center;
+/* Botão de Fechar Menu/Dropdown */
+.close-button {
+    background: none;
+    border: none;
+    color: white; /* Para o header */
+    font-size: 1.8em;
+    cursor: pointer;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    line-height: 1;
+    padding: 5px; /* Área clicável maior */
+    z-index: 1005; /* Acima de tudo */
+    display: none;;
 }
-.button-group button {
-    flex-grow: 1; /* Permite que os botões cresçam para ocupar o espaço */
-    max-width: 250px; /* Limite de largura para evitar botões muito longos */
+.close-button.for-dropdown {
+    color: var(--text-color); /* Cor para o card de dropdown (fundo branco) */
 }
 
 
 /* Mensagens de Resultado */
-#result {
-    margin-top: 25px;
-    padding: 15px;
-    border-radius: 8px;
-    background-color: white;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.05); /* Sombra interna sutil */
-}
-
-#result p {
-    margin: 0;
+.message-area p {
     font-size: 1.1em;
+    margin: 0;
 }
 
 .success-message {
@@ -192,22 +349,7 @@ button:active {
     color: var(--error-red);
 }
 
-/* Status de Login */
-.login-status {
-    font-weight: bold;
-    margin-left: 15px;
-    font-size: 1.1em;
-}
-
-.status-logged-in {
-    color: var(--success-green);
-}
-
-.status-not-logged-in {
-    color: var(--error-red);
-}
-
-/* Footer (Placeholder Futuro) */
+/* Footer */
 .app-footer {
     background-color: var(--dark-gray);
     color: white;
@@ -216,28 +358,179 @@ button:active {
     margin-top: 20px;
 }
 
-
 /* ============================================================= */
 /* Responsividade (Media Queries) */
 /* ============================================================= */
 
 /* Para telas menores que 768px (tablets e smartphones) */
 @media (max-width: 768px) {
+    .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 20px; /* Mantém padding para evitar corte lateral */
+        height: auto;
+        width: 100%;
+    }
+    .app-header-left {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    .app-header h1 {
+        font-size: 1.5em;
+    }
+    .app-logo {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* Hambúrguer */
+    .hamburger-menu {
+        display: block; /* Mostra o ícone de hambúrguer em mobile */
+        order: 0; /* Hambúrguer primeiro no grupo da direita (à esquerda) */
+        border-radius: 10px;
+    }
+
+    .close-button {
+        display: block;
+    }
+
+    /* Foto de Perfil no Header */
+    .profile-menu-img {
+        /* margin-right: 40px; */
+        margin-left: auto;
+        display: block; /* Mostra a foto de perfil em mobile */
+        order: 1; /* Foto depois do hambúrguer no grupo da direita (à direita) */
+    }
+
+    /* Container da direita (foto de perfil e hambúrguer) */
+    .app-header-right {
+        order: 1;
+        width: 100%;
+        justify-content: center; /* (não usar space-between): Espaça hambúrguer (esquerda) e foto (direita) */
+        margin-bottom: 10px;
+        padding: 0 20px; /* Padding horizontal para alinhar elementos internos */
+        box-sizing: border-box;
+    }
+
+    /* Menu de Navegação Principal (Home, Conta) */
+    .app-nav {
+        position: absolute;
+        top: var(--header-height);
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-blue);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        z-index: 999;
+        flex-direction: column;
+        align-items: flex-start;
+        border-top: 3px solid var(--light-gray);
+    }
+    /* Garante que o menu principal seja oculto por padrão em mobile se não ativo */
+    .app-nav:not(.active) {
+        display: none;
+    }
+    .app-nav.active {
+        margin-top: 40px;
+        max-height: 400px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        display: flex; /* Torna-o flex quando ativo */
+    }
+    .app-nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 20px;
+        gap: 10px;
+        width: 100%;
+    }
+    .app-nav li {
+        width: 100%;
+        display: block;
+    }
+    .app-nav a {
+        padding: 10px 0;
+        width: 100%;
+        text-align: left;
+    }
+    
+    /* Card de Perfil no Menu (Dropdown) - Mobile */
+    #profileCardDropdown {
+        position:absolute; /* Posicionamento absoluto no mobile */
+        top: calc(var(--header-height) * 1 + 10px); /* baixo do header, 1 linha (app-header-right) + 10px */
+        right: auto; /* Alinha à direita com o padding do header */
+        left: auto; /* Garante alinhamento à direita */
+        transform: translateX(0); /* Remove transform de desktop */
+        width: 100%; /* Largura quase total da tela */
+        max-width: 320px;
+        box-shadow: var(--box-shadow);
+        border: none;
+        background-color: white;
+        padding: 15px;
+        border-radius: var(--border-radius);
+        z-index: 1001;
+        display: none; /* Oculto por padrão. Só JS vai mostrar! */
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        color: var(--text-color);
+    }
+    /* Classe para mostrar o dropdown do perfil quando clicado no mobile */
+    #profileCardDropdown.mobile-active {
+        display: flex;
+    }
+
+    /* Ajustes para a imagem de perfil grande e conteúdo no dropdown mobile */
+    #profileCardDropdown .profile-picture {
+        display: block; /* Mostra a imagem maior no dropdown mobile */
+        width: 80px;
+        height: 80px;
+        margin-bottom: 10px;
+    }
+    #profileCardDropdown .user-name {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: var(--primary-blue); /* Ajusta cor para fundo branco */
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    #profileCardDropdown .user-email {
+        font-size: 0.9em;
+        color: var(--text-color); /* Ajusta cor para fundo branco */
+        margin-bottom: 10px;
+        white-space: normal;
+    }
+    #profileCardDropdown #logoutBtn {
+        width: 100%;
+        margin-top: 0;
+        margin-left: 0;
+        background-color: var(--error-red);
+        font-size: 1em;
+    }
+
+
     .app-container {
         margin: 10px;
         padding: 15px;
     }
 
-    .app-header h1 {
-        font-size: 1.8em;
+    #main-status-section {
+        margin-top: calc(var(--header-height));
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .login-status {
+        margin-left: 0;
+        margin-bottom: 10px;
     }
 
-    .app-header .app-nav ul {
-        flex-direction: column;
-        gap: 5px;
-    }
-    .app-nav li {
-        margin: 0;
+    .cards-grid {
+        grid-template-columns: 1fr;
     }
 
     .card {
@@ -245,11 +538,16 @@ button:active {
     }
 
     .button-group {
-        flex-direction: column; /* Botões empilhados em telas pequenas */
+        flex-direction: column;
         gap: 10px;
+        width: 100%;
     }
     .button-group button {
-        max-width: 100%; /* Ocupa toda a largura disponível */
+        max-width: 100%;
+    }
+    button {
+        padding: 10px 15px;
+        font-size: 0.9em;
     }
 }
 
@@ -261,17 +559,20 @@ button:active {
     }
 
     .app-header {
-        padding: 15px 10px;
+        padding: 10px;
     }
-
     .app-header h1 {
-        font-size: 1.5em;
+        font-size: 1.3em;
+    }
+    .app-logo {
+        width: 30px;
+        height: 30px;
     }
 
     h2 {
-        font-size: 1.4em;
-        margin-top: 20px;
-        margin-bottom: 15px;
+        font-size: 1.2em;
+        margin-top: 15px;
+        margin-bottom: 10px;
     }
 
     .card {
@@ -283,18 +584,47 @@ button:active {
     input[type="number"],
     input[type="password"],
     textarea {
-        width: 100%; /* Já ajustado, mas bom revisar */
+        width: calc(100% - 22px);
         padding: 8px;
         margin-bottom: 8px;
     }
 
     button {
         padding: 10px 15px;
-        font-size: 0.95em;
+        font-size: 0.9em;
+    }
+
+    #profileCardDropdown {
+        right: auto; /* Alinha à direita com o padding do header */
+        left: auto; /* Garante alinhamento à direita */
     }
 }
 
 /* Estilos para evitar FOUC (Flash Of Unauthenticated Content) */
 #app-content {
     display: none; /* Conteúdo oculto por padrão no HTML */
+}
+
+/***********************************************/
+/* Botão de Login com Google */
+#googleLoginBtn {
+    padding: 12px 20px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--secondary-blue);
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#googleLoginBtn:hover {
+    background-color: var(--primary-blue);
+    transform: translateY(-2px);
+}
+
+#googleLoginBtn:active {
+    transform: translateY(0);
 }
