@@ -127,18 +127,36 @@ function toggleHamburgerMenu() {
 // Função para lidar com o clique do botão "Agendar Evento"
 // =============================================================
 async function handleScheduleEvent() {
-    const title = document.getElementById('eventTitle').value;
-    const year = parseInt(document.getElementById('eventYear').value, 10);
-    const month = parseInt(document.getElementById('eventMonth').value, 10);
-    const day = parseInt(document.getElementById('eventDay').value, 10);
+    const title = document.getElementById('eventTitle').value.trim();
+    // Usa o operador || '0' para garantir que empty strings se tornem '0' para parseInt.
+    // Se o input.value for "", parseInt("") é NaN.
+    // Se for "0", parseInt("0") é 0.
+    const year = parseInt(document.getElementById('eventYear').value || '0', 10);
+    const month = parseInt(document.getElementById('eventMonth').value || '0', 10);
+    const day = parseInt(document.getElementById('eventDay').value || '0', 10);
+    const hour = parseInt(document.getElementById('eventHour').value || '0', 10);
+    const minute = parseInt(document.getElementById('eventMinute').value || '0', 10);
 
-    if (!title || isNaN(year) || isNaN(month) || isNaN(day)) {
-        displayResult('Por favor, preencha todos os campos do evento.', true);
+    console.log(year, month, day, hour, minute);
+
+    // Validação estendida no front-end
+    if (!title) {
+        displayResult('Título do evento é obrigatório.', true);
+        return;
+    }
+    // Verifica se os valores são válidos numericamente e nos limites
+    // A validação de range (min/max nos inputs HTML) e o || '0' deveriam evitar NaN.
+    if (year < 1900 || year > 2100 ||
+        month < 1 || month > 12 ||
+        day < 1 || day > 31 ||
+        hour < 0 || hour > 23 ||
+        minute < 0 || minute > 59) {
+        displayResult('Por favor, preencha todos os campos de data e hora com valores válidos.', true);
         return;
     }
 
     try {
-        const result = await scheduleEvent({ title, year, month, day });
+        const result = await scheduleEvent({ title, year, month, day, hour, minute });
         console.log('POST /schedule-event: ', result);
         displayResult(`Evento agendado com sucesso! <a href="${result.eventLink}" target="_blank">Ver no Google Calendar</a>`);
     } catch (error) {

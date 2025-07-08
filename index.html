@@ -18,25 +18,20 @@
         </div>
         
         <nav class="app-nav" id="mainNav">
-            <button class="close-button" id="mainNavCloseBtn">✕</button> <!-- Botão Fechar para o menu principal -->
+            <button class="close-button for-nav" id="mainNavCloseBtn">✕</button>
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="#">Sobre o App</a></li>
+                <li><a href="#">Conta</a></li>
             </ul>
         </nav>
 
         <div class="app-header-right">
-            <!-- Hamburger Menu Button -->
             <button class="hamburger-menu" id="hamburgerMenu">☰</button>
-
-            <!-- Profile Image -->
             <img id="profileMenuImage" src="" alt="Perfil" class="profile-menu-img" style="display: none;">
             
-            <!-- Profile Card Dropdown -->
             <div id="profileCardDropdown" class="card">
-                <button class="close-button for-dropdown" id="profileDropdownCloseBtn">✕</button> <!-- Botão Fechar para o dropdown -->
+                <button class="close-button for-dropdown" id="profileDropdownCloseBtn">✕</button>
                 <h3>Seu Perfil</h3>
-                <!-- A imagem maior do card de perfil -->
                 <img id="profilePicture" src="" alt="Foto de Perfil" class="profile-picture"> 
                 <p class="user-name" id="profileName"></p>
                 <p class="user-email" id="profileEmail"></p>
@@ -51,37 +46,46 @@
         </div>
 
         <div class="cards-grid">
+            <!-- Card: Gerenciar Google Calendar -->
             <div class="card">
                 <h3>📅 Gerenciar Google Calendar</h3>
                 <div class="form-group">
                     <label for="eventTitle">Título do Evento:</label>
-                    <input type="text" id="eventTitle" placeholder="Título do Evento">
+                    <input type="text" id="eventTitle" placeholder="Título do Evento" required>
                 </div>
                 <div class="form-group">
                     <label>Data (Ano/Mês/Dia):</label>
-                    <input type="number" id="eventYear" placeholder="Ano" value="2025">
-                    <input type="number" id="eventMonth" placeholder="Mês" value="7">
-                    <input type="number" id="eventDay" placeholder="Dia" value="1">
+                    <input type="number" id="eventYear" placeholder="Ano" value="2025" required>
+                    <input type="number" id="eventMonth" placeholder="Mês" value="7" required>
+                    <input type="number" id="eventDay" placeholder="Dia" value="1" required>
+                </div>
+                <!-- Inputs para Hora e Minuto -->
+                <div class="form-group">
+                    <label>Hora (HH:MM):</label>
+                    <input type="number" id="eventHour" placeholder="Hora (0-23)" value="10" min="0" max="23" required>
+                    <input type="number" id="eventMinute" placeholder="Minuto (0-59)" value="00" min="0" max="59" required>
                 </div>
                 <div class="button-group">
                     <button id="scheduleEventBtn">Agendar Evento</button>
                 </div>
             </div>
 
+            <!-- Card: Importar Eventos de Google Sheets -->
             <div class="card">
                 <h3>📈 Importar Eventos de Google Sheets</h3>
                 <div class="form-group">
                     <label for="spreadsheetIdInput">URL da Planilha Google (obrigatório):</label>
-                    <input type="text" id="spreadsheetIdInput" placeholder="https://docs.google.com/spreadsheets/d/ID_AQUI/edit">
+                    <input type="text" id="spreadsheetIdInput" placeholder="https://docs.google.com/spreadsheets/d/ID_AQUI/edit" required>
                 </div>
                 <div class="form-group">
                     <label for="sheetNameInput">Nome da Aba (ex: Sheet1):</label>
-                    <input type="text" id="sheetNameInput" placeholder="Nome da Aba">
+                    <input type="text" id="sheetNameInput" placeholder="Nome da Aba" required>
                 </div>
                 <div class="button-group">
                     <button id="importEventsBtn">Importar Eventos da Planilha</button>
                 </div>
             </div>
+            
         </div>
 
     </main>
