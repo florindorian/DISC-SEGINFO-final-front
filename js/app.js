@@ -1,6 +1,7 @@
 // Entrada: Nenhuma (inicializa e associa eventos)
 // Saída: void
 import { scheduleEvent, checkAuthStatus, importEventsFromSheet, logout} from './api/apiService.js';
+import { FRONT_BASE_URL } from './config.js';
 import { displayResult } from './utils/domHandler.js';
 
 const appContent = document.getElementById('app-content');
@@ -13,7 +14,7 @@ const verifyAuthAndLoadContent = async () => {
     if (!token) {
         // Se não tem token no localStorage, redireciona para a página de login
         console.warn('Token JWT não encontrado. Redirecionando para login.');
-        window.location.href = 'http://127.0.0.1:5500/login.html';
+        window.location.href =  `${FRONT_BASE_URL}/login.html`;
         return;
     }
 
@@ -27,12 +28,12 @@ const verifyAuthAndLoadContent = async () => {
         } else {
             console.warn('Token JWT inválido ou sessão inativa. Redirecionando para login.');
             localStorage.removeItem('appJwt'); // Limpa token inválido
-            window.location.href = 'http://127.0.0.1:5500/login.html';
+            window.location.href = `${FRONT_BASE_URL}/login.html`;
         }
     } catch (error) {
         console.error('Erro ao verificar autenticação inicial:', error);
         localStorage.removeItem('appJwt'); // Limpa token inválido ou erro de fetch
-        window.location.href = 'http://127.0.0.1:5500/login.html';
+        window.location.href = `${FRONT_BASE_URL}/login.html`;
     }
 };
 
@@ -42,14 +43,14 @@ async function handleLogout() {
     try {
         await logout();
         localStorage.removeItem('appJwt');
-        window.location.href = 'http://127.0.0.1:5500/login.html';
+        window.location.href = `${FRONT_BASE_URL}/login.html`;
     } catch (error) {
         console.error('Erro ao realizar logout:', error);
         displayResult(`Erro ao realizar logout: ${error.message}`, true);
         // Se houver erro no logout, mesmo assim tenta redirecionar para a página de login
         // para evitar que o usuário fique em um estado "meio logado".
         localStorage.removeItem('appJwt'); // Garante que o token é removido mesmo com erro no backend.
-        window.location.href = 'http://127.0.0.1:5500/login.html';
+        window.location.href = `${FRONT_BASE_URL}/login.html`;
     }
 }
 
