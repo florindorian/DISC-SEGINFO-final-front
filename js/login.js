@@ -1,11 +1,8 @@
 // =============================================================
 // Lógica para a página de login.
 // =============================================================
-// Entrada: Nenhuma (inicializa e associa eventos)
-// Saída: void
-import { displayResult } from './utils/domHandler.js'; // Reutiliza displayResult
-
-
+import { FRONT_BASE_URL } from './config.js';
+import { API_BASE_URL } from './api/apiConfig.js';
 const loginMessageDiv = document.getElementById('loginMessage');
 
 // Sobrescreve a função displayResult APENAS para login.js
@@ -22,7 +19,7 @@ const displayLoginMessage = (message, isError = false) => {
 
 async function handleGoogleLogin() {
     // URL do endpoint de autenticação OAuth do back-end
-    const authUrl = 'http://localhost:3001/auth/google';
+    const authUrl = `${API_BASE_URL}/auth/google`;
     console.log(`Redirecionando para: ${authUrl}`);
     
     window.location.href = authUrl;
@@ -44,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         displayLoginMessage('Login bem-sucedido! Redirecionando para a página principal...', false);
         // Redireciona para a página principal após salvar o token
-        window.location.href = 'http://127.0.0.1:5500/index.html';
+        window.location.href = `${FRONT_BASE_URL}/index.html`;
     } else if (hash.includes('error=')) {
         // Fluxo de ERRO após OAuth
         const errorMessage = decodeURIComponent(hash.split('error=')[1].split('&')[0]);
