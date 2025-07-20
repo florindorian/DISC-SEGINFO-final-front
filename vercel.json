@@ -2,18 +2,11 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/login.html"
+      "destination": "/index.html"
     },
     {
       "source": "/api/(.*)",
       "destination": "https://disc-seginfo-final-back.vercel.app/$1"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/index.html",
-      "destination": "/login.html",
-      "statusCode": 302
     }
   ]
 }
